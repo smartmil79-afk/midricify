@@ -1,83 +1,18 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import { getWorkspaceContext } from "@/lib/workspace";
-
-export default async function AccountsPayablePage() {
-  const ctx = await getWorkspaceContext();
-  const sb = await createClient();
-  let rows: any[] = [];
-
-  if (ctx?.organization) {
-    const { data } = await sb
-      .from("ap_invoices")
-      .select("id,invoice_number,invoice_date,due_date,total,currency_code,status,vendors(name),purchase_orders(po_number)")
-      .eq("organization_id", ctx.organization.id)
-      .order("invoice_date", { ascending: false });
-    rows = data ?? [];
-  }
-
-  return (
-    <main className="min-h-screen bg-slate-50 p-5 md:p-10">
-      <div className="mx-auto max-w-6xl">
-        <Link href="/" className="text-sm text-blue-700">← Dashboard</Link>
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold">Accounts Payable</h1>
-            <p className="text-slate-500">Supplier invoices, matching exceptions and payment tracking.</p>
-          </div>
-          <Link href="/accounts-payable/new" className="rounded-lg bg-blue-700 px-4 py-2 text-white">
-            + Record Invoice
-          </Link>
-        </div>
-        <div className="mt-6 overflow-x-auto rounded-2xl border bg-white">
-          <table className="w-full min-w-[700px] text-sm">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="p-3 text-left">Invoice</th>
-                <th className="p-3 text-left">Vendor</th>
-                <th className="p-3 text-left">PO</th>
-                <th className="p-3 text-right">Amount</th>
-                <th className="p-3 text-left">Due</th>
-                <th className="p-3 text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((invoice) => (
-                <tr className="border-t" key={invoice.id}>
-                  <td className="p-3">
-                    <Link className="font-medium text-blue-700" href={`/accounts-payable/${invoice.id}`}>
-                      {invoice.invoice_number}
-                    </Link>
-                    <div className="text-xs text-slate-500">
-                      {new Date(invoice.invoice_date).toLocaleDateString("en-NG")}
-                    </div>
-                  </td>
-                  <td className="p-3">{invoice.vendors?.name ?? "—"}</td>
-                  <td className="p-3">{invoice.purchase_orders?.po_number ?? "—"}</td>
-                  <td className="p-3 text-right">
-                    {new Intl.NumberFormat("en-NG", { style: "currency", currency: invoice.currency_code }).format(invoice.total)}
-                  </td>
-                  <td className="p-3">
-                    {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString("en-NG") : "—"}
-                  </td>
-                  <td className="p-3">
-                    <span className="rounded-full bg-slate-100 px-2 py-1 capitalize">
-                      {String(invoice.status).replaceAll("_", " ")}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-500">
-                    No supplier invoices recorded.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
-  );
+import {createClient} from "@/lib/supabase/server";
+import {getWorkspaceContext} from "@/lib/workspace";
+function money(value:number,currency:string){return new Intl.NumberFormat("en-NG",{style:"currency",currency,maximumFractionDigits:2}).format(value||0)}
+function statusStyle(status:string){if(status==="paid"||status==="approved")return "bg-emerald-50 text-emerald-700";if(status==="exception"||status==="rejected")return "bg-rose-50 text-rose-700";if(status==="matched"||status==="pending_match")return "bg-amber-50 text-amber-700";return "bg-slate-100 text-slate-700"}
+export default async function AccountsPayablePage(){
+ const ctx=await getWorkspaceContext();const sb=await createClient();let rows:any[]=[];
+ if(ctx?.organization){const {data}=await sb.from("ap_invoices").select("id,invoice_number,invoice_date,due_date,total,currency_code,status,vendors(name),purchase_orders(po_number),ap_invoice_payments(amount)").eq("organization_id",ctx.organization.id).order("invoice_date",{ascending:false});rows=data??[];}
+ const currency=ctx?.organization?.base_currency??"NGN";const today=new Date().toISOString().slice(0,10);
+ const totals=rows.map(i=>({total:Number(i.total||0),paid:(i.ap_invoice_payments??[]).reduce((s:number,p:any)=>s+Number(p.amount||0),0),status:i.status,due:i.due_date}));
+ const outstanding=totals.reduce((s,i)=>s+Math.max(i.total-i.paid,0),0);
+ const overdue=totals.filter(i=>i.due&&i.due<today&&i.total>i.paid&&i.status!=="rejected").length;
+ const cards=[["Supplier invoices",String(rows.length)],["Awaiting match",String(rows.filter(i=>["pending_match","exception"].includes(i.status)).length)],["Approved / unpaid",String(rows.filter(i=>i.status==="approved").length)],["Outstanding balance",money(outstanding,currency)]];
+ return <main className="min-h-screen bg-slate-50 p-5 md:p-10"><div className="mx-auto max-w-6xl"><div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-bold">Accounts Payable</h1><p className="text-slate-500 mt-1">Supplier invoices, three-way matching, exceptions and payment tracking.</p></div><Link href="/accounts-payable/new" className="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white">+ Record Invoice</Link></div>
+ <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{cards.map(([label,value])=><div key={label} className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-2 text-xl font-bold text-slate-900">{value}</p></div>)}</div>
+ {overdue>0&&<div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">{overdue} invoice(s) are past their due date and still have an outstanding balance.</div>}
+ <div className="mt-6 overflow-x-auto rounded-2xl border bg-white"><table className="w-full min-w-[850px] text-sm"><thead className="bg-slate-50"><tr><th className="p-3 text-left">Invoice</th><th className="p-3 text-left">Vendor</th><th className="p-3 text-left">PO</th><th className="p-3 text-right">Invoice total</th><th className="p-3 text-right">Outstanding</th><th className="p-3 text-left">Due</th><th className="p-3 text-left">Status</th></tr></thead><tbody>{rows.map(invoice=>{const paid=(invoice.ap_invoice_payments??[]).reduce((s:number,p:any)=>s+Number(p.amount||0),0);const balance=Math.max(Number(invoice.total||0)-paid,0);return <tr className="border-t" key={invoice.id}><td className="p-3"><Link className="font-medium text-blue-700 hover:underline" href={`/accounts-payable/${invoice.id}`}>{invoice.invoice_number}</Link><div className="text-xs text-slate-500">{new Date(invoice.invoice_date+"T00:00:00").toLocaleDateString("en-NG")}</div></td><td className="p-3">{invoice.vendors?.name??"—"}</td><td className="p-3">{invoice.purchase_orders?.po_number??"—"}</td><td className="p-3 text-right">{money(Number(invoice.total),invoice.currency_code)}</td><td className="p-3 text-right font-medium">{money(balance,invoice.currency_code)}</td><td className="p-3">{invoice.due_date?new Date(invoice.due_date+"T00:00:00").toLocaleDateString("en-NG"):"—"}</td><td className="p-3"><span className={`rounded-full px-2.5 py-1 text-xs capitalize ${statusStyle(invoice.status)}`}>{String(invoice.status).replaceAll("_"," ")}</span></td></tr>})}{!rows.length&&<tr><td colSpan={7} className="p-10 text-center text-slate-500">No supplier invoices recorded yet. Start by recording an invoice against an approved purchase order.</td></tr>}</tbody></table></div></div></main>
 }
