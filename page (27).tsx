@@ -1,0 +1,6 @@
+import Link from 'next/link';
+import { getWorkspaceContext } from '@/lib/workspace';
+import TeamManager from './TeamManager';
+export default async function TeamPage(){ const ctx=await getWorkspaceContext(); const isAdmin=ctx?.membership?.role==='company_admin'; return <main className="min-h-screen bg-slate-50 p-5 md:p-10"><div className="max-w-4xl mx-auto"><Link href="/settings" className="text-sm text-blue-700">← Settings</Link><h1 className="text-2xl font-bold mt-4">Team & invitations</h1><p className="text-slate-500 mt-1">Manage workspace membership.</p>
+ {isAdmin&&<section className="bg-white border rounded-2xl p-5 mt-6"><h2 className="font-semibold">Invite a teammate</h2><TeamManager/><p className="text-xs text-slate-500 mt-2">Invitation records are saved to the database. Email delivery and acceptance links are not configured yet.</p></section>}
+ <section className="bg-white border rounded-2xl p-5 mt-4"><h2 className="font-semibold">Members <span className="text-slate-400 font-normal">({ctx?.memberCount??0})</span></h2><div className="mt-4 text-sm text-slate-500 border rounded-lg p-4">{ctx?.organization?`Workspace: ${ctx.organization.name}`:'No connected workspace.'} Membership roster UI is forthcoming; the count is live.</div></section></div></main> }

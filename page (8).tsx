@@ -1,0 +1,2 @@
+import OnboardingForm from './OnboardingForm';
+export default function OnboardingPage(){return <main className="min-h-screen bg-slate-50 grid place-items-center p-4"><div className="w-full max-w-2xl bg-white border rounded-2xl p-7 shadow-sm"><div className="text-blue-600 font-bold">MIDRICIFY</div><h1 className="text-2xl font-bold mt-3">Set up your organization</h1><p className="text-slate-500 mt-2">Create your company workspace and become its first Company Admin.</p><OnboardingForm/></div></main>}

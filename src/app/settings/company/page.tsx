@@ -1,0 +1,7 @@
+import Link from 'next/link';
+import { getWorkspaceContext } from '@/lib/workspace';
+export default async function CompanySettingsPage(){
+ const ctx=await getWorkspaceContext(); const org=ctx?.organization;
+ return <main className="min-h-screen bg-slate-50 p-5 md:p-10"><div className="max-w-3xl mx-auto"><Link href="/settings" className="text-sm text-blue-700">← Settings</Link><h1 className="text-2xl font-bold mt-4">Company profile</h1><p className="text-slate-500 mt-2">Organization details and financial defaults.</p>
+ <div className="bg-white border rounded-2xl p-5 mt-6 space-y-4"><div><label className="text-sm font-medium">Organization name</label><div className="mt-1 w-full border rounded-lg p-2.5 bg-slate-50">{org?.name??'No workspace connected'}</div></div><div className="grid sm:grid-cols-2 gap-4"><div><label className="text-sm font-medium">Country</label><div className="mt-1 border rounded-lg p-2.5 bg-slate-50">{org?.country_code??'—'}</div></div><div><label className="text-sm font-medium">Base currency</label><div className="mt-1 border rounded-lg p-2.5 bg-slate-50">{org?.base_currency??'—'}</div></div></div><div><label className="text-sm font-medium">Timezone</label><div className="mt-1 border rounded-lg p-2.5 bg-slate-50">Africa/Lagos (default)</div></div><div className="rounded-xl bg-blue-50 border border-blue-100 p-3 text-sm text-blue-800">Company profile information is now loaded from your workspace database. Editing is planned for the next settings stage.</div></div></div></main>
+}

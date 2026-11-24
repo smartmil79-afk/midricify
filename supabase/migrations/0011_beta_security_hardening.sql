@@ -1,0 +1,20 @@
+-- Restrict RPC execution to authenticated sessions only. Trigger functions remain internal.
+revoke execute on all functions in schema public from public, anon;
+grant execute on function public.is_org_member(uuid) to authenticated;
+grant execute on function public.has_org_role(uuid,text[]) to authenticated;
+grant execute on function public.create_organization_for_current_user(text,text,text) to authenticated;
+grant execute on function public.submit_purchase_request(text,text,uuid,date,text,jsonb) to authenticated;
+grant execute on function public.decide_purchase_request(uuid,text,text) to authenticated;
+grant execute on function public.save_purchase_request_draft(uuid,text,text,uuid,date,text,jsonb) to authenticated;
+grant execute on function public.submit_saved_purchase_request(uuid) to authenticated;
+grant execute on function public.create_purchase_order(uuid,uuid,text,date,text,text) to authenticated;
+grant execute on function public.submit_purchase_order(uuid) to authenticated;
+grant execute on function public.decide_purchase_order(uuid,text,text) to authenticated;
+grant execute on function public.create_goods_receipt(uuid,date,text,jsonb) to authenticated;
+grant execute on function public.inspect_goods_receipt(uuid,jsonb,text) to authenticated;
+grant execute on function public.create_ap_invoice(uuid,text,date,date,numeric,text,jsonb) to authenticated;
+grant execute on function public.approve_ap_invoice(uuid,text) to authenticated;
+grant execute on function public.record_ap_payment(uuid,text,date,numeric,text,text) to authenticated;
+grant execute on function public.create_department_budget(uuid,text,int,date,date,numeric,text) to authenticated;
+grant execute on function public.request_budget_transfer(uuid,uuid,numeric,text) to authenticated;
+grant execute on function public.decide_budget_transfer(uuid,text,text) to authenticated;

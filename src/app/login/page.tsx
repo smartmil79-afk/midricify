@@ -1,0 +1,3 @@
+import Link from 'next/link';
+import LoginForm from './LoginForm';
+export default function LoginPage(){return <main className="min-h-screen grid place-items-center p-5 bg-[#12233F]"><div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-xl"><div className="flex items-center gap-3 mb-8"><div className="h-10 w-10 rounded-xl bg-blue-600 text-white grid place-items-center font-bold">M</div><div className="font-bold text-[#12233F]">MIDRICIFY</div></div><h1 className="text-2xl font-bold">Welcome back</h1><p className="text-slate-500 text-sm mt-2">Sign in to your workspace.</p><LoginForm/><Link href="/" className="block text-center text-sm text-slate-400 mt-5">Back to preview</Link></div></main>}

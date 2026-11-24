@@ -1,0 +1,9 @@
+'use client';
+import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
+export default function LoginForm(){
+ const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [error,setError]=useState(''); const [busy,setBusy]=useState(false);
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{const supabase=createClient();const {error}=await supabase.auth.signInWithPassword({email,password});if(error)throw error;window.location.href='/';}catch(err){setError(err instanceof Error?err.message:'Unable to sign in. Check your details and try again.')}finally{setBusy(false)}}
+ return <form onSubmit={submit} className="space-y-4 mt-6"><label className="block text-sm font-medium">Email address<input type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com" className="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"/></label><label className="block text-sm font-medium">Password<input type="password" required autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter password" className="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"/></label>{error&&<p role="alert" className="text-sm text-red-600 bg-red-50 rounded-lg p-3">{error}</p>}<button disabled={busy} className="w-full bg-blue-600 disabled:opacity-60 text-white rounded-lg py-2.5 font-semibold">{busy?'Signing in…':'Sign in'}</button><p className="text-sm text-center text-slate-500">New to MIDRICIFY? <Link href="/onboarding" className="text-blue-600 font-medium">Create a workspace</Link></p></form>
+}
