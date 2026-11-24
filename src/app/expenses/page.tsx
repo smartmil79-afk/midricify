@@ -6,7 +6,7 @@ function money(n:number,c:string){return new Intl.NumberFormat('en-NG',{style:'c
 const labels:Record<string,string>={operating:'Operating expense',software_subscription:'Software & subscriptions',services:'Services',travel:'Travel',utilities:'Utilities',other:'Other'};
 export default async function ExpensesPage(){
  const ctx=await getWorkspaceContext();const sb=await createClient();let rows:any[]=[];
- if(ctx?.organization){const {data}=await sb.from('expense_requests').select('id,expense_number,title,category,amount,currency_code,status,expense_date,supplier_name,departments(name)').eq('organization_id',ctx.organization.id).order('created_at',{ascending:false});rows=data??[];}
+ if(ctx?.organization){const {data}=await sb.from('expense_requests').select('id,expense_number,title,category,amount,currency_code,status,expense_date,supplier_name,approval_note,departments(name)').eq('organization_id',ctx.organization.id).order('created_at',{ascending:false});rows=data??[];}
  const currency=ctx?.organization?.base_currency??'NGN';
  const sum=(s:string)=>rows.filter(x=>x.status===s).reduce((a,x)=>a+Number(x.amount||0),0);
  return <main className="min-h-screen bg-slate-50 p-5 md:p-10"><div className="mx-auto max-w-6xl"><div className="flex flex-wrap justify-between gap-3 items-center"><div><h1 className="text-2xl font-bold">Expense Management</h1><p className="text-slate-500 mt-1">Track operating costs, software subscriptions and service expenses separately from asset procurement.</p></div><Link href="/expenses/new" className="rounded-lg bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold">+ New Expense</Link></div>
