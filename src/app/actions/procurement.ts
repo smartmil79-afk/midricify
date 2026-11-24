@@ -120,7 +120,7 @@ export async function recordApPaymentAction(invoiceId:string,formData:FormData){
 
 export async function createDepartmentBudgetAction(formData:FormData){
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
- const {data,error}=await supabase.rpc('create_department_budget',{p_department_id:String(formData.get('department_id')??'')||null,p_name:String(formData.get('name')??''),p_year:Number(formData.get('fiscal_year')),p_start:String(formData.get('period_start')??''),p_end:String(formData.get('period_end')??''),p_amount:Number(formData.get('allocated_amount')),p_currency:String(formData.get('currency_code')??'NGN')});
+ const {data,error}=await supabase.rpc('create_department_budget',{p_department_id:String(formData.get('department_id')??'')||null,p_name:String(formData.get('name')??''),p_year:Number(formData.get('fiscal_year')),p_start:String(formData.get('period_start')??''),p_end:String(formData.get('period_end')??''),p_amount:Number(formData.get('allocated_amount')),p_currency:String(formData.get('currency_code')??'NGN'),p_budget_type:String(formData.get('budget_type')??'procurement')});
  if(error)return {error:error.message};revalidatePath('/budgets');return {success:true};
 }
 export async function requestBudgetTransferAction(formData:FormData){
