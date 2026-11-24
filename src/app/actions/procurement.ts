@@ -16,7 +16,7 @@ export async function submitPurchaseRequest(formData:FormData){
  const supabase=await createClient(); const {data:auth}=await supabase.auth.getUser(); if(!auth.user)return {error:'Please sign in.'};
  const {data,error}=await supabase.rpc('submit_purchase_request',{p_title:title,p_justification:justification,p_department_id:department,p_needed_by:neededBy,p_currency_code:currency,p_items:items});
  if(error)return {error:error.message};
- redirect(`/procurement/${data}`);
+ redirect(`/procurement/${data}?result=request-submitted`);
 }
 export async function addRequestComment(formData:FormData){
  const requestId=String(formData.get('request_id')??''), comment=String(formData.get('comment')??'').trim();
@@ -51,7 +51,7 @@ export async function savePurchaseRequestDraft(formData:FormData){
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const {data,error}=await supabase.rpc('save_purchase_request_draft',{p_request_id:requestId,p_title:title,p_justification:justification,p_department_id:department,p_needed_by:neededBy,p_currency_code:currency,p_items:items});
  if(error)return {error:error.message};
- redirect(`/procurement/${data}`);
+ redirect(`/procurement/${data}?result=draft-saved`);
 }
 
 export async function submitSavedDraft(requestId:string){
@@ -64,13 +64,13 @@ export async function createVendor(formData:FormData){
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const {getWorkspaceContext}=await import('@/lib/workspace');const workspace=await getWorkspaceContext();if(!workspace?.organization)return {error:'Organization workspace not found.'};
  const {error}=await supabase.from('vendors').insert({organization_id:workspace.organization.id,name,contact_name:String(formData.get('contact_name')??'').trim()||null,email:String(formData.get('email')??'').trim()||null,phone:String(formData.get('phone')??'').trim()||null,address:String(formData.get('address')??'').trim()||null,tax_id:String(formData.get('tax_id')??'').trim()||null,payment_terms:String(formData.get('payment_terms')??'Net 30').trim(),created_by:u.user.id});
- if(error)return {error:error.message};revalidatePath('/vendors');return {success:true};
+ if(error)return {error:error.message};revalidatePath('/vendors');redirect('/vendors?result=vendor-created');
 }
 export async function createPurchaseOrder(formData:FormData){
  const requestId=String(formData.get('request_id')??''),vendorId=String(formData.get('vendor_id')??'');if(!requestId||!vendorId)return {error:'Select a vendor.'};
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const {data,error}=await supabase.rpc('create_purchase_order',{p_request_id:requestId,p_vendor_id:vendorId,p_delivery_address:String(formData.get('delivery_address')??'').trim()||null,p_delivery_date:String(formData.get('delivery_date')??'')||null,p_payment_terms:String(formData.get('payment_terms')??'').trim()||null,p_notes:String(formData.get('notes')??'').trim()||null});
- if(error)return {error:error.message};redirect(`/purchase-orders/${data}`);
+ if(error)return {error:error.message};redirect(`/purchase-orders/${data}?result=po-created`);
 }
 export async function submitPurchaseOrderAction(poId:string){const supabase=await createClient();const {data,error}=await supabase.rpc('submit_purchase_order',{p_po_id:poId});if(error)return {error:error.message};revalidatePath(`/purchase-orders/${poId}`);return {success:true};}
 export async function decidePurchaseOrderAction(poId:string,decision:'approved'|'rejected',note:string){const supabase=await createClient();const {data,error}=await supabase.rpc('decide_purchase_order',{p_po_id:poId,p_decision:decision,p_note:note});if(error)return {error:error.message};revalidatePath(`/purchase-orders/${poId}`);revalidatePath('/purchase-orders');return {success:true};}
@@ -82,7 +82,7 @@ export async function createGoodsReceiptAction(formData:FormData){
  if(!poId||!items.length||items.some(i=>!i.purchase_order_item_id||!Number.isFinite(Number(i.quantity_received))||Number(i.quantity_received)<=0))return {error:'Enter valid received quantities for at least one line.'};
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const {data,error}=await supabase.rpc('create_goods_receipt',{p_po_id:poId,p_received_date:receivedDate||null,p_delivery_note:deliveryNote||null,p_items:items});
- if(error)return {error:error.message};redirect(`/receiving/${data}`);
+ if(error)return {error:error.message};redirect(`/receiving/${data}?result=goods-received`);
 }
 export async function inspectGoodsReceiptAction(receiptId:string,decisions:any[],note:string){
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
@@ -96,7 +96,7 @@ export async function createApInvoiceAction(formData:FormData){
  if(!poId||!number||!items.length||items.some(i=>Number(i.quantity)<=0||Number(i.unit_price)<0))return {error:'Complete invoice details and line items.'};
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const {data,error}=await supabase.rpc('create_ap_invoice',{p_po_id:poId,p_invoice_number:number,p_invoice_date:date||null,p_due_date:due,p_tax:tax,p_notes:notes,p_items:items});
- if(error)return {error:error.message};redirect(`/accounts-payable/${data}`);
+ if(error)return {error:error.message};redirect(`/accounts-payable/${data}?result=invoice-created`);
 }
 export async function approveApInvoiceAction(invoiceId:string,note:string){
  const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
