@@ -7,22 +7,29 @@ export function ProcessingOverlay(){
  const pathname=usePathname();
  useEffect(()=>{
   let timeout:ReturnType<typeof setTimeout>|undefined;
-  const start=()=>{setActive(true);if(timeout)clearTimeout(timeout);timeout=setTimeout(()=>setActive(false),45000);};
-  const onSubmit=(event:Event)=>{const form=event.target;if(form instanceof HTMLFormElement){if(form.dataset.noProcessing==="true")return;start();}};
+  const start=()=>{
+   setActive(true);
+   if(timeout)clearTimeout(timeout);
+   timeout=setTimeout(()=>setActive(false),3500);
+  };
+  const onSubmit=(event:Event)=>{
+   const form=event.target;
+   if(form instanceof HTMLFormElement&&form.dataset.noProcessing!=="true")start();
+  };
   const onClick=(event:MouseEvent)=>{
    const target=event.target;
    if(!(target instanceof Element))return;
    const button=target.closest("button");
-   if(!button||button.disabled)return;
-   if(button.type==="submit"){start();return;}
-   if(button.getAttribute("aria-label")==="Toggle navigation"||button.getAttribute("aria-label")==="Close navigation")return;
-   if(button.closest('[role="dialog"]'))return;
-   if(button.dataset.noProcessing==="true")return;
+   if(!button||button.disabled||button.dataset.processing!=="true")return;
    start();
   };
   document.addEventListener("submit",onSubmit,true);
   document.addEventListener("click",onClick,true);
-  return()=>{document.removeEventListener("submit",onSubmit,true);document.removeEventListener("click",onClick,true);if(timeout)clearTimeout(timeout);};
+  return()=>{
+   document.removeEventListener("submit",onSubmit,true);
+   document.removeEventListener("click",onClick,true);
+   if(timeout)clearTimeout(timeout);
+  };
  },[]);
  useEffect(()=>{setActive(false);},[pathname]);
  if(!active)return null;
