@@ -96,12 +96,11 @@ export default async function Home() {
   const departmentSpend = departments.map((department) => {
     const ids = budgetRows.filter((row) => row.department_id === department.id);
     const amount = ids.reduce((sum, budget) => {
-      const matching = budgetRows.find((item) => item.id === budget.id);
-      return sum + Number(matching?.allocated_amount || 0);
+      return sum + Number(budget.allocated_amount || 0);
     }, 0);
     const used = ids.reduce((sum, budget) => {
-      const summary: any = ({} as any);
-      return sum + Number(summary.committed_amount || 0) + Number(summary.actual_spend || 0);
+      const summary: any = budgetSummaryRows.find((row) => row.budget_id === budget.id);
+      return sum + Number(summary?.committed_amount || 0) + Number(summary?.actual_spend || 0);
     }, 0);
     return { name: department.name, amount, used };
   }).filter((item) => item.amount > 0).slice(0, 4);
