@@ -48,7 +48,8 @@ export default async function Home() {
   let pendingApprovals = 0;
   let allocatedBudget = 0;
   let committedAndActual = 0;
-  let budgetRows: any[] = [];\n  let budgetSummaryRows: any[] = [];
+  let budgetRows: any[] = [];
+  let budgetSummaryRows: any[] = [];
   let dataWarning = "";
 
   if (workspace?.organization?.id) {
