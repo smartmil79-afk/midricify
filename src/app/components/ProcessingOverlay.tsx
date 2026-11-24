@@ -8,9 +8,9 @@ export function ProcessingOverlay(){
  useEffect(()=>{
   let timeout:ReturnType<typeof setTimeout>|undefined;
   const start=()=>{
+   if(timeout)return;
    setActive(true);
-   if(timeout)clearTimeout(timeout);
-   timeout=setTimeout(()=>setActive(false),3500);
+   timeout=setTimeout(()=>{setActive(false);timeout=undefined;},3000);
   };
   const onSubmit=(event:Event)=>{
    const form=event.target;
