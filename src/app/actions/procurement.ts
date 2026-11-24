@@ -18,6 +18,16 @@ export async function submitPurchaseRequest(formData:FormData){
  if(error)return {error:error.message};
  redirect(`/procurement/${data}?result=request-submitted`);
 }
+export async function updatePurchaseRequestBeforeHod(formData:FormData){
+ const requestId=String(formData.get('request_id')??''),title=String(formData.get('title')??'').trim(),justification=String(formData.get('justification')??'').trim();
+ const neededBy=String(formData.get('needed_by')??'')||null,items=parseItems(String(formData.get('items_json')??''));
+ if(!requestId||title.length<3||justification.length<5||!items||items.some(i=>i.description.length<2||!Number.isFinite(i.quantity)||i.quantity<=0||!Number.isFinite(i.estimated_unit_price)||i.estimated_unit_price<0))return {error:'Check the request details and all line items.'};
+ const supabase=await createClient();const {data:u}=await supabase.auth.getUser();if(!u.user)return {error:'Sign in required.'};
+ const {data,error}=await supabase.rpc('update_purchase_request_before_hod',{p_request_id:requestId,p_title:title,p_justification:justification,p_needed_by:neededBy,p_items:items});
+ if(error)return {error:error.message};
+ revalidatePath(`/procurement/${requestId}`);redirect(`/procurement/${requestId}?result=updated`);
+}
+
 export async function addRequestComment(formData:FormData){
  const requestId=String(formData.get('request_id')??''), comment=String(formData.get('comment')??'').trim();
  if(!requestId||comment.length<2)return {error:'Comment is required.'};
