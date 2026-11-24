@@ -114,25 +114,7 @@ export default async function Home() {
   ];
 
   return (
-    <main className="min-h-screen md:flex">
-      <aside className="hidden md:flex md:w-64 md:flex-col bg-[#12233F] text-white px-5 py-6">
-        <div className="flex items-center gap-3 mb-9"><div className="h-10 w-10 rounded-xl bg-blue-500 flex items-center justify-center font-black text-lg">M</div><div><div className="font-bold tracking-wide">MIDRICIFY</div><div className="text-xs text-blue-200">Business Suite</div></div></div>
-        <div className="text-[11px] uppercase tracking-widest text-slate-400 mb-3">Workspace</div>
-        <nav className="space-y-1">
-          {nav.map((item) => {
-            const Icon = item.icon;
-            const href = item.label === "Overview" ? "/" : item.label === "Procurement" ? "/procurement" : item.label === "Budgets" ? "/budgets" : item.label === "Vendors" ? "/vendors" : item.label === "Purchase Orders" ? "/purchase-orders" : item.label === "Goods Receiving" ? "/receiving" : item.label === "Invoices & Payables" ? "/accounts-payable" : item.label === "Accounting" ? "/accounting" : item.label === "Inventory" ? "/inventory" : "/reports";
-            return <Link key={item.label} href={href} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm ${item.active ? "bg-white/10 text-white" : "text-slate-300 hover:bg-white/5"}`}><Icon size={18}/>{item.label}</Link>;
-          })}
-        </nav>
-        <div className="mt-auto">
-          <div className="text-[11px] uppercase tracking-widest text-slate-400 mb-3">Administration</div>
-          <Link href="/settings/team" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 hover:bg-white/5"><ShieldCheck size={18}/>Users & permissions</Link>
-          <Link href="/settings" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 hover:bg-white/5"><Settings size={18}/>Settings</Link>
-          <form action={signOut} className="mt-2"><button className="w-full text-left flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 hover:bg-white/5">Sign out</button></form>
-          <div className="mt-5 border-t border-white/10 pt-4 flex items-center gap-3"><div className="h-9 w-9 rounded-full bg-blue-300 text-[#12233F] flex items-center justify-center text-sm font-bold">{initials}</div><div className="min-w-0"><div className="text-sm font-medium">{displayName}</div><div className="text-xs text-slate-400">{workspace?.membership?.role?.replaceAll("_", " ") ?? "Workspace member"}</div></div><ChevronDown size={15} className="ml-auto"/></div>
-        </div>
-      </aside>
+    <main className="min-h-screen">
       <section className="flex-1 min-w-0">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8"><div className="md:hidden flex items-center gap-2 font-bold text-[#12233F]"><div className="h-8 w-8 rounded-lg bg-blue-600 text-white flex items-center justify-center">M</div>MIDRICIFY</div><div className="hidden md:flex text-sm text-slate-500">{workspaceName} <span className="mx-2">/</span> Overview</div><div className="flex items-center gap-4"><button className="relative text-slate-500" aria-label="Notifications"><Bell size={20}/></button><div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">{initials}</div><span className="hidden sm:block text-sm font-medium">{displayName}</span></div></div></header>
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
