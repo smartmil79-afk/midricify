@@ -8,7 +8,7 @@ export default async function RequestDetailPage({params}:{params:Promise<{id:str
  const {data:request}=await supabase.from('purchase_requests').select('*,purchase_request_items(*)').eq('id',id).maybeSingle();
  if(!request||!ctx?.organization||request.organization_id!==ctx.organization.id)return <main className="p-10"><Link href="/procurement">← Procurement</Link><p className="mt-6">Request not found or you don't have access.</p></main>;
  const [{data:approvals},{data:comments},{data:attachments}]=await Promise.all([
- supabase.from('purchase_request_approvals').select('step_number,approver_role,status,decision_note,decided_at,approver_id').eq('request_id',id).order('step_number'),
+ supabase.from('purchase_request_approvals').select('step_number,approver_role,status,decision_note,decided_at,approver_id,department_id').eq('request_id',id).order('step_number'),
  supabase.from('purchase_request_comments').select('id,comment,author_id,created_at').eq('request_id',id).order('created_at'),
  supabase.from('purchase_request_attachments').select('id,file_name,storage_path,mime_type,file_size,uploaded_by,created_at').eq('request_id',id).order('created_at')
  ]);
