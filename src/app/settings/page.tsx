@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Building2, Users, Shield, Settings2 } from "lucide-react";
+import { Building2, Users, Shield, Settings2, UserCircle } from "lucide-react";
 const items = [
+  { href: "/settings/profile", title: "My profile", description: "Update your personal details, contact information, avatar, and unit.", icon: UserCircle },
   { href: "/settings/company", title: "Company profile", description: "Organization details, country, currency, and fiscal year.", icon: Building2 },
   { href: "/settings/departments", title: "Departments", description: "Manage department names, codes, and managers.", icon: Users },
   { href: "/settings/team", title: "Team & invitations", description: "Review members and prepare invitations.", icon: Users },
