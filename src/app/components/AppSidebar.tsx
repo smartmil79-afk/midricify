@@ -3,11 +3,11 @@ import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {useState} from 'react';
 import {signOut} from '@/app/actions/auth';
-import {LayoutDashboard,ClipboardList,ShoppingCart,PackageCheck,ClipboardCheck,Users,Boxes,Wallet,FileText,CircleDollarSign,BarChart3,ShieldCheck,Settings,Menu,X,Receipt,LogOut} from 'lucide-react';
+import {LayoutDashboard,ClipboardList,ShoppingCart,PackageCheck,ClipboardCheck,Users,Boxes,Wallet,FileText,CircleDollarSign,BarChart3,ShieldCheck,Settings,Menu,X,Receipt,LogOut,UserCircle} from 'lucide-react';
 const groups=[
  {label:'WORKSPACE',items:[['Dashboard','/',LayoutDashboard],['Purchase Requests','/procurement',ClipboardList],['Approvals','/approvals',ClipboardCheck],['Purchase Orders','/purchase-orders',ShoppingCart],['Goods Receiving','/receiving',PackageCheck],['Suppliers','/vendors',Users],['Items & Inventory','/inventory',Boxes]]},
  {label:'FINANCE & REPORTS',items:[['Expenses','/expenses',Receipt],['Budgets','/budgets',Wallet],['Invoices & Payables','/accounts-payable',FileText],['Accounting','/accounting',CircleDollarSign],['Reports','/reports',BarChart3]]},
- {label:'ADMINISTRATION',items:[['Users & Roles','/settings/team',ShieldCheck],['Settings','/settings',Settings]]}
+ {label:'ADMINISTRATION',items:[['My Profile','/settings/profile',UserCircle],['Users & Roles','/settings/team',ShieldCheck],['Settings','/settings',Settings]]}
 ] as const;
 export function BrandMark({small=false}:{small?:boolean}){return <svg viewBox="0 0 48 48" width={small?34:42} height={small?34:42} aria-hidden="true"><rect x="1" y="1" width="46" height="46" rx="13" fill="#f97316"/><path d="M11 13h5l4.2 18.5h15.2l4.1-13.2H19" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="23" cy="37" r="2.5" fill="white"/><circle cx="34" cy="37" r="2.5" fill="white"/><path d="m25 16 4.4 4.4L39 10.8" fill="none" stroke="#12233f" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"/></svg>}
 export function AppSidebar(){const pathname=usePathname();const [open,setOpen]=useState(false);const hidden=pathname==='/login'||pathname==='/signup'||pathname.startsWith('/auth/');if(hidden)return null;
