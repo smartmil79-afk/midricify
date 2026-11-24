@@ -31,13 +31,13 @@ function statusClass(status: string) {
   return "bg-slate-100 text-slate-600";
 }
 function titleCase(value: string) {
-  return value.replaceAll("_", " ").replace(/\\b\\w/g, (letter) => letter.toUpperCase());
+  return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 export default async function Home() {
   const workspace = await getWorkspaceContext();
   const displayName = workspace?.user.fullName || workspace?.user.email?.split("@")[0] || "Workspace User";
-  const initials = displayName.split(/\\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
+  const initials = displayName.split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
   const workspaceName = workspace?.organization?.name || "Your Workspace";
   const currency = workspace?.organization?.base_currency || "NGN";
 
@@ -78,7 +78,8 @@ export default async function Home() {
       unpaidCount = unpaid.length;
       pendingApprovals = approvalsRes.count ?? 0;
       requests = requestsRes.data ?? [];
-      budgetRows = budgetsRes.data ?? [];\n      budgetSummaryRows = summaryRes.data ?? [];
+      budgetRows = budgetsRes.data ?? [];
+      budgetSummaryRows = summaryRes.data ?? [];
       const summaries = new Map((summaryRes.data ?? []).map((row) => [row.budget_id, row]));
       allocatedBudget = budgetRows.reduce((sum, row) => sum + Number(row.allocated_amount || 0), 0);
       committedAndActual = budgetRows.reduce((sum, row) => {
