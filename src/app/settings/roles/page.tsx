@@ -1,8 +1,33 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-const roles=[['Company Admin','Full workspace administration'],['Requester','Create and track purchase requests'],['Department Head','Review department requests'],['Procurement Officer','Manage sourcing and purchase orders'],['Auditor','Read-only audit access'],['Finance Officer','Budget and payment review'],['Accountant','Accounting records and journals'],['Storekeeper','Receiving and inventory'],['Executive Approver','High-value approval authority']];
+import { getWorkspaceContext } from '@/lib/workspace';
+import RolesMatrix from './RolesMatrix';
+const roles=[
+ {key:'requester',label:'Requester',description:'Create and track purchase requests'},
+ {key:'department_head',label:'Department Head',description:'Review department requests'},
+ {key:'procurement_officer',label:'Procurement Officer',description:'Manage sourcing and purchase orders'},
+ {key:'auditor',label:'Auditor',description:'Read-only audit access'},
+ {key:'finance_officer',label:'Finance Officer',description:'Budget and payment review'},
+ {key:'accountant',label:'Accountant',description:'Accounting records and journals'},
+ {key:'storekeeper',label:'Storekeeper',description:'Receiving and inventory'},
+ {key:'executive_approver',label:'Executive Approver',description:'High-value approval authority'}
+];
 export default async function RolesPage(){
- let permissions:{key:string;description:string}[]=[];
- try{const supabase=await createClient();const {data}=await supabase.from('permissions').select('key,description').order('key');permissions=data??[]}catch{}
- return <main className="min-h-screen bg-slate-50 p-5 md:p-10"><div className="max-w-5xl mx-auto"><Link href="/settings" className="text-sm text-blue-700">← Settings</Link><h1 className="text-2xl font-bold mt-4">Roles & permissions</h1><p className="text-slate-500 mt-1">Default roles and live permission catalog.</p><div className="grid md:grid-cols-2 gap-4 mt-6"><section className="bg-white border rounded-2xl p-5"><h2 className="font-semibold">Roles</h2><div className="divide-y mt-3">{roles.map(([name,desc])=><div key={name} className="py-3"><div className="font-medium text-sm">{name}</div><div className="text-xs text-slate-500 mt-1">{desc}</div></div>)}</div></section><section className="bg-white border rounded-2xl p-5"><h2 className="font-semibold">Permission catalog <span className="text-slate-400 font-normal">({permissions.length})</span></h2><p className="text-xs text-slate-500 mt-1">Loaded from database when available.</p><div className="mt-4 space-y-2">{permissions.map(p=><div key={p.key} className="border rounded-lg p-2"><div className="font-mono text-xs font-medium">{p.key}</div><div className="text-xs text-slate-500 mt-1">{p.description}</div></div>)}</div>{!permissions.length&&<p className="text-sm text-slate-500 mt-4">Permission catalog not connected. Apply the migrations to populate this section.</p>}<div className="rounded-xl bg-blue-50 text-blue-800 p-3 mt-5 text-sm">Permission enforcement and role editing are the next access-control milestone.</div></section></div></div></main>
+ const ctx=await getWorkspaceContext();
+ const supabase=await createClient();
+ const [{data:permissions},{data:assigned}] = await Promise.all([
+  supabase.from('permissions').select('id,key,description').order('key'),
+  ctx?.organization ? supabase.from('organization_role_permissions').select('role,permission_id').eq('organization_id',ctx.organization.id) : Promise.resolve({data:[] as {role:string;permission_id:string}[]})
+ ]);
+ const initial:Record<string,string[]>={};
+ for(const row of assigned??[]) (initial[row.role]??=[]).push(row.permission_id);
+ const isAdmin=ctx?.membership?.role==='company_admin';
+ return <main className="min-h-screen bg-slate-50 p-5 md:p-10"><div className="max-w-6xl mx-auto">
+  <Link href="/settings" className="text-sm text-blue-700">← Settings</Link>
+  <h1 className="text-2xl font-bold mt-4">Roles & permissions</h1>
+  <p className="text-slate-500 mt-1">Configure permission access for each role in {ctx?.organization?.name??'your workspace'}.</p>
+  {!ctx?.organization ? <div className="bg-white border rounded-xl p-5 mt-6 text-sm text-amber-700">No active workspace membership was found.</div> :
+   <RolesMatrix roles={roles} permissions={permissions??[]} initial={initial} isAdmin={isAdmin}/>}
+  <p className="text-xs text-slate-400 mt-5">Permission assignments are stored per workspace. Company Admin is protected. Module actions must also enforce these permission keys before the matrix can be treated as complete access control.</p>
+ </div></main>;
 }
