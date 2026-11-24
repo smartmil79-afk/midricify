@@ -1,0 +1,14 @@
+import Link from 'next/link';
+import {createClient} from '@/lib/supabase/server';
+import {getWorkspaceContext} from '@/lib/workspace';
+function money(n:number,c:string){return new Intl.NumberFormat('en-NG',{style:'currency',currency:c,maximumFractionDigits:2}).format(n||0)}
+const labels:Record<string,string>={operating:'Operating expense',software_subscription:'Software & subscriptions',services:'Services',travel:'Travel',utilities:'Utilities',other:'Other'};
+export default async function ExpensesPage(){
+ const ctx=await getWorkspaceContext();const sb=await createClient();let rows:any[]=[];
+ if(ctx?.organization){const {data}=await sb.from('expense_requests').select('id,expense_number,title,category,amount,currency_code,status,expense_date,supplier_name,departments(name)').eq('organization_id',ctx.organization.id).order('created_at',{ascending:false});rows=data??[];}
+ const currency=ctx?.organization?.base_currency??'NGN';
+ const sum=(s:string)=>rows.filter(x=>x.status===s).reduce((a,x)=>a+Number(x.amount||0),0);
+ return <main className="min-h-screen bg-slate-50 p-5 md:p-10"><div className="mx-auto max-w-6xl"><div className="flex flex-wrap justify-between gap-3 items-center"><div><h1 className="text-2xl font-bold">Expense Management</h1><p className="text-slate-500 mt-1">Track operating costs, software subscriptions and service expenses separately from asset procurement.</p></div><Link href="/expenses/new" className="rounded-lg bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold">+ New Expense</Link></div>
+ <div className="grid gap-3 sm:grid-cols-3 mt-6">{[['Submitted',rows.filter(x=>x.status==='submitted').length],['Approved value',money(sum('approved'),currency)],['Rejected value',money(sum('rejected'),currency)]].map(([l,v])=><div key={String(l)} className="bg-white border rounded-xl p-4"><p className="text-xs text-slate-500">{l}</p><p className="text-xl font-bold mt-2">{v}</p></div>)}</div>
+ <div className="mt-6 bg-white border rounded-2xl overflow-x-auto"><table className="w-full min-w-[760px] text-sm"><thead className="bg-slate-50"><tr>{['Reference','Expense','Category','Department','Supplier','Amount','Date','Status'].map(x=><th key={x} className="p-3 text-left">{x}</th>)}</tr></thead><tbody>{rows.map(x=><tr key={x.id} className="border-t"><td className="p-3 font-medium">{x.expense_number}</td><td className="p-3">{x.title}</td><td className="p-3">{labels[x.category]??x.category}</td><td className="p-3">{x.departments?.name??'—'}</td><td className="p-3">{x.supplier_name??'—'}</td><td className="p-3">{money(Number(x.amount),x.currency_code)}</td><td className="p-3">{new Date(x.expense_date+'T00:00:00').toLocaleDateString('en-NG')}</td><td className="p-3"><span className="rounded-full bg-slate-100 px-2.5 py-1 capitalize">{x.status}</span></td></tr>)}{!rows.length&&<tr><td colSpan={8} className="p-10 text-center text-slate-500">No expenses recorded yet.</td></tr>}</tbody></table></div></div></main>
+}
