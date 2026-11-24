@@ -48,7 +48,7 @@ export default async function Home() {
   let pendingApprovals = 0;
   let allocatedBudget = 0;
   let committedAndActual = 0;
-  let budgetRows: any[] = [];
+  let budgetRows: any[] = [];\n  let budgetSummaryRows: any[] = [];
   let dataWarning = "";
 
   if (workspace?.organization?.id) {
@@ -77,7 +77,7 @@ export default async function Home() {
       unpaidCount = unpaid.length;
       pendingApprovals = approvalsRes.count ?? 0;
       requests = requestsRes.data ?? [];
-      budgetRows = budgetsRes.data ?? [];
+      budgetRows = budgetsRes.data ?? [];\n      budgetSummaryRows = summaryRes.data ?? [];
       const summaries = new Map((summaryRes.data ?? []).map((row) => [row.budget_id, row]));
       allocatedBudget = budgetRows.reduce((sum, row) => sum + Number(row.allocated_amount || 0), 0);
       committedAndActual = budgetRows.reduce((sum, row) => {
