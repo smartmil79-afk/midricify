@@ -1,0 +1,1 @@
+export default function ReportsPage() { return <main className="min-h-screen p-6 bg-slate-50"><div className="max-w-5xl mx-auto bg-white rounded-xl border p-6"><h1 className="text-2xl font-bold">Reports</h1><p className="text-slate-500 mt-2">Analytics and reporting modules will be added after transactional workflows.</p></div></main>; }

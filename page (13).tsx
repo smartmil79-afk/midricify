@@ -1,0 +1,1 @@
+export default function AccountingPage() { return <main className="min-h-screen p-6 bg-slate-50"><div className="max-w-5xl mx-auto bg-white rounded-xl border p-6"><h1 className="text-2xl font-bold">Accounting</h1><p className="text-slate-500 mt-2">The accounting engine will be introduced after the procure-to-pay workflow.</p></div></main>; }
