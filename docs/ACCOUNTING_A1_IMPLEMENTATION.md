@@ -11,7 +11,7 @@ A1 (Fiscal Calendar and Chart of Accounts) has been implemented and verified in 
 - Added four permissions: `finance.period.view`, `finance.period.manage`, `finance.accounts.view`, and `finance.accounts.manage`.
 - Enabled RLS on all three tables. Policies are limited to authenticated users and use `has_org_permission`.
 - Revoked `anon` and authenticated table privileges before granting the minimum required authenticated privileges.
-- Added a fiscal-year generator that uses `organizations.fiscal_year_start_month`, creates twelve monthly periods, and is idempotent for an organisation/fiscal-year start date.
+- Added a fiscal-year generator that uses `organizations.fiscal_year_start_month`, creates twelve monthly periods, labels the fiscal year by its start year (for example, FY2026), and is idempotent for an organisation/fiscal-year start date.
 - Added database guards against overlapping/out-of-year accounting periods and cyclic chart-of-account parent relationships.
 - Added indexes for the new user-reference foreign keys.
 
@@ -20,6 +20,7 @@ A1 (Fiscal Calendar and Chart of Accounts) has been implemented and verified in 
 - The complete DDL was first validated inside a transaction and rolled back.
 - The A1 migration was then applied to the test project as migration version `20261125203147`.
 - The foreign-key index follow-up was applied as migration version `20261125203252`.
+- Added an `updated_at` trigger for chart-of-accounts edits in migration version `20261125203442`.
 - Verified all three tables have RLS enabled and the expected authenticated-only policies and grants.
 - Exercised fiscal-year generation as an authenticated company administrator: FY2026 generated twelve periods from 1 January through 31 December 2026. The test transaction was rolled back, so no sample fiscal year or chart accounts were left behind.
 - Exercised the overlap and hierarchy-cycle guards; both rejected invalid changes. The test transaction was rolled back.
