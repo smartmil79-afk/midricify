@@ -1,7 +1,9 @@
 'use server';
 import {createClient} from '@/lib/supabase/server';
 import {revalidatePath} from 'next/cache';
+import {requireWorkspacePermission} from '@/lib/permissions';
 export async function createExpenseRequestAction(formData:FormData){
+ const denied=await requireWorkspacePermission(['finance.manage']);if(denied)return denied;
  const title=String(formData.get('title')??'').trim(),description=String(formData.get('description')??'').trim(),amount=Number(formData.get('amount'));
  if(title.length<3||description.length<5||!Number.isFinite(amount)||amount<=0)return {error:'Enter a valid title, description and amount.'};
  const sb=await createClient();const {data:u}=await sb.auth.getUser();if(!u.user)return {error:'Sign in required.'};
@@ -9,6 +11,7 @@ export async function createExpenseRequestAction(formData:FormData){
  if(error)return {error:error.message};revalidatePath('/expenses');return {success:true,id:data};
 }
 export async function decideExpenseRequestAction(id:string,decision:'approved'|'rejected',note:string){
+ const denied=await requireWorkspacePermission(['finance.manage']);if(denied)return denied;
  const sb=await createClient();const {data:u}=await sb.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const {error}=await sb.rpc('decide_expense_request',{p_expense_id:id,p_decision:decision,p_note:note});
  if(error)return {error:error.message};revalidatePath('/expenses');return {success:true};
