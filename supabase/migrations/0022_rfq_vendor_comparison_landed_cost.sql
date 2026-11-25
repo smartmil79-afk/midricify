@@ -85,3 +85,12 @@ drop policy if exists vendor_quotation_items_write_workspace on public.vendor_qu
 create policy vendor_quotation_items_write_workspace on public.vendor_quotation_items for all to authenticated using(exists(select 1 from public.vendor_quotations q where q.id=quotation_id and public.has_org_permission(q.organization_id,'procurement.rfq.manage'))) with check(exists(select 1 from public.vendor_quotations q where q.id=quotation_id and public.has_org_permission(q.organization_id,'procurement.rfq.manage')));
 
 grant select,insert,update,delete on public.rfqs,public.rfq_items,public.rfq_vendors,public.vendor_quotations,public.vendor_quotation_items to authenticated;
+
+-- Let workspace members read role grants so the invoker-rights permission check can evaluate them.
+drop policy if exists "workspace admins read role permissions" on public.organization_role_permissions;
+create policy "workspace members read role permissions" on public.organization_role_permissions
+for select to authenticated using (
+ exists(select 1 from public.organization_memberships m
+ where m.organization_id=organization_role_permissions.organization_id
+ and m.user_id=(select auth.uid()) and m.status='active')
+);
