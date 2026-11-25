@@ -3,9 +3,9 @@ import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {useState} from 'react';
 import {signOut} from '@/app/actions/auth';
-import {LayoutDashboard,ClipboardList,ShoppingCart,PackageCheck,ClipboardCheck,Users,Boxes,Wallet,FileText,CircleDollarSign,BarChart3,ShieldCheck,Settings,Menu,X,Receipt,LogOut,UserCircle} from 'lucide-react';
+import {LayoutDashboard,ClipboardList,ShoppingCart,PackageCheck,ClipboardCheck,Users,Boxes,Wallet,FileText,CircleDollarSign,BarChart3,ShieldCheck,Settings,Menu,X,Receipt,LogOut,UserCircle,GitCompareArrows} from 'lucide-react';
 const groups=[
- {label:'WORKSPACE',items:[['Dashboard','/',LayoutDashboard],['Purchase Requests','/procurement',ClipboardList],['Approvals','/approvals',ClipboardCheck],['Purchase Orders','/purchase-orders',ShoppingCart],['Goods Receiving','/receiving',PackageCheck],['Suppliers','/vendors',Users],['Items & Inventory','/inventory',Boxes]]},
+ {label:'WORKSPACE',items:[['Dashboard','/',LayoutDashboard],['Purchase Requests','/procurement',ClipboardList],['Approvals','/approvals',ClipboardCheck],['Purchase Orders','/purchase-orders',ShoppingCart],['RFQ & Vendor Comparison','/sourcing',GitCompareArrows],['Goods Receiving','/receiving',PackageCheck],['Suppliers','/vendors',Users],['Items & Inventory','/inventory',Boxes]]},
  {label:'FINANCE & REPORTS',items:[['Expenses','/expenses',Receipt],['Budgets','/budgets',Wallet],['Invoices & Payables','/accounts-payable',FileText],['Accounting','/accounting',CircleDollarSign],['Reports','/reports',BarChart3]]},
  {label:'ADMINISTRATION',items:[['My Profile','/settings/profile',UserCircle],['Users & Roles','/settings/team',ShieldCheck],['Roles & Permissions','/settings/roles',ShieldCheck],['Settings','/settings',Settings]]}
 ] as const;
