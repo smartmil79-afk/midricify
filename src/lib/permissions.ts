@@ -9,7 +9,7 @@ export async function hasAnyWorkspacePermission(keys:string[]){
  const {data:grants}=await sb.from('organization_role_permissions').select('permission_id').eq('organization_id',ctx.organization.id).eq('role',ctx.membership.role).in('permission_id',ids).limit(1);
  return !!grants?.length;
 }
-export async function requireWorkspacePermission(keys:string[]){
+export async function requireWorkspacePermission(keys:string[]):Promise<any>{
  const ok=await hasAnyWorkspacePermission(keys);
  return ok?null:{error:'You do not have permission to perform this action. Contact your workspace administrator.'};
 }
