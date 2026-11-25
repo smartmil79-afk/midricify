@@ -1,0 +1,4 @@
+create index accounting_fiscal_years_created_by_idx on public.accounting_fiscal_years(created_by);
+create index accounting_fiscal_years_closed_by_idx on public.accounting_fiscal_years(closed_by);
+create index accounting_periods_closed_by_idx on public.accounting_periods(closed_by);
+create index chart_of_accounts_created_by_idx on public.chart_of_accounts(created_by);
