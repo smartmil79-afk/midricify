@@ -3,9 +3,11 @@ import {createClient} from '@/lib/supabase/server';
 import {getWorkspaceContext} from '@/lib/workspace';
 import {revalidatePath} from 'next/cache';
 import {redirect} from 'next/navigation';
+import {requireWorkspacePermission} from '@/lib/permissions';
 
 const jsonArray=(v:FormDataEntryValue|null)=>{try{const x=JSON.parse(String(v??'[]'));return Array.isArray(x)?x:null;}catch{return null;}};
 export async function createRfqAction(formData:FormData){
+ const denied=await requireWorkspacePermission(['procurement.rfq.manage']);if(denied)return denied;
  const ctx=await getWorkspaceContext();if(!ctx?.organization)return {error:'Workspace not found.'};
  const sb=await createClient();const {data:u}=await sb.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const title=String(formData.get('title')??'').trim(),description=String(formData.get('description')??'').trim();
@@ -21,6 +23,7 @@ export async function createRfqAction(formData:FormData){
  revalidatePath('/sourcing');redirect('/sourcing/'+rfq.id);
 }
 export async function saveVendorQuotationAction(rfqId:string,formData:FormData){
+ const denied=await requireWorkspacePermission(['procurement.rfq.manage']);if(denied)return denied;
  const ctx=await getWorkspaceContext();if(!ctx?.organization)return {error:'Workspace not found.'};
  const sb=await createClient();const {data:u}=await sb.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const items=jsonArray(formData.get('items_json'));if(!items?.length||items.some((x:any)=>!x.rfq_item_id||!Number.isFinite(Number(x.quantity))||Number(x.quantity)<=0||!Number.isFinite(Number(x.unit_price))||Number(x.unit_price)<0))return {error:'Enter valid quoted prices for every RFQ item.'};
@@ -34,6 +37,7 @@ export async function saveVendorQuotationAction(rfqId:string,formData:FormData){
  revalidatePath('/sourcing/'+rfqId);return {success:true};
 }
 export async function selectRecommendedVendorAction(rfqId:string,quotationId:string,vendorId:string){
+ const denied=await requireWorkspacePermission(['procurement.rfq.manage']);if(denied)return denied;
  const ctx=await getWorkspaceContext();if(!ctx?.organization)return {error:'Workspace not found.'};
  const sb=await createClient();const {data:u}=await sb.auth.getUser();if(!u.user)return {error:'Sign in required.'};
  const {data:q,error}=await sb.from('vendor_quotations').select('id,vendor_id,rfq_id,organization_id').eq('id',quotationId).eq('rfq_id',rfqId).eq('organization_id',ctx.organization.id).maybeSingle();
