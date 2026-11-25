@@ -1,7 +1,7 @@
 'use server';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath } from 'next/cache';\nimport {requireWorkspacePermission} from '@/lib/permissions';
 
 function parseItems(raw:string){
  try { const v=JSON.parse(raw); if(!Array.isArray(v)||!v.length) return null;
